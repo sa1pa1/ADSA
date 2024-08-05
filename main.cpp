@@ -52,7 +52,7 @@ vector<int> SubtractSchool(vector<int> i1, vector<int> i2, int b){
         length = i2.size();
     }
 
-    for(int i =length -1;i>0;i++){
+    for(int i =length -1;i>=0;i++){
         temp = i1.at(i) - i2.at(i) - carry;
         if(temp<0){
             sub.insert(sub.begin(), temp+b);
@@ -203,13 +203,12 @@ int main(){
     getline(cin,str);
     vector<int> no1; //first vector to store number
     vector<int> no2; //second vector to store number
-    int base;
-    int counter;
-    int stringSize=str.size();
+    int base=0;
+    int counter=0;
+    int size=str.size();
 
-    counter=0;
     //parsing input
-    for(int i =0; i<stringSize;i++){
+    for(int i =0; i<size;i++){
         if(str.at(0)==' '){
             counter++;
             str.erase(0, 1);
@@ -223,14 +222,13 @@ int main(){
         } else{
             stringstream iss(str);
             iss >> base;
+            break;
         }
     }
    
     vector<int> addition = AdditionSchool(no1,no2,base);
     vector<int> mult = Karatsuba(no1,no2,base);
     vector<int> multresult;
-
-
     auto it = std::find_if(mult.begin(), mult.end(), [](int nonzero){
         return nonzero !=0;
     });
