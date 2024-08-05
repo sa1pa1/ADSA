@@ -147,12 +147,12 @@ if (i1.size()<i2.size()){
 //dividing into a0,a1,b0,b1
 int n = max(i1.size(),i2.size());
 
-if (n<4){
-    vector<int> result;
-    result = MultiplySchool(i1,i2,b);
-    return result;
+// if (n<4){
+//     vector<int> result;
+//     result = MultiplySchool(i1,i2,b);
+//     return result;
 
-}else {
+// }else {
 
 int k = (int)floor(n/2);
 int subarr = (int)ceil(n/2);
@@ -190,7 +190,7 @@ fill_n(p3.begin(), k,0);
 vector<int> result = AdditionSchool(p0,AdditionSchool(p2,p3,b),b);
 return result;
 }
-}
+// }
 //PRINT RESULT
 void print(vector<int> number){
     int size = number.size();
