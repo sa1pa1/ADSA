@@ -124,11 +124,13 @@ if (i1.size()<i2.size()){
 if (i1.size()==1 || i2.size()==1){
     vector<int> results;
     unsigned long long mult, int1 = 0, int2 = 0;
+    int size1 = i1.size();
+    int size2 = i2.size();
 
-        for(int i=0 ; i<i1.size();i++){
+        for(int i=0 ; i<size1;i++){
             int1 = b*int1 + i1.at(i);
         }
-        for(int i=0 ; i<i2.size(); i++){
+        for(int i=0 ; i<size2; i++){
             int2 = b*int2+ i2.at(i);
         }
         mult = int1*int2;
@@ -156,22 +158,25 @@ int subarr = (int)ceil(n/2);
 
 vector<int> a1;
 vector<int> a0;
+int size1 = i1.size();
 
 for (int i =0; i<subarr;i++){
     a1.push_back(i1.at(i));
 }
 
-for (int i = subarr; i <i1.size();i++){
+for (int i = subarr; i <size1;i++){
     a0.push_back(i1.at(i));
 }
 
 vector<int>b1;
 vector<int>b0;
+int size2 = i2.size();
 
 for (int i = 0; i<subarr; i++){
     b1.push_back(i2.at(i));
 }
-for (int i = subarr; i <i2.size(); i++){
+
+for (int i = subarr; i <size2; i++){
     b0.push_back(i2.at(i));
 }
 vector<int> p0 = Karatsuba(a0,b0,b);
@@ -187,7 +192,8 @@ return result;
 }
 //PRINT RESULT
 void print(vector<int> number){
-    for(int i =0; i <number.size();i++){
+    int size = number.size();
+    for(int i =0; i <size;i++){
         cout<<number.at(i);
     }
 }
@@ -230,8 +236,9 @@ int main(){
     });
     
     if (it!=mult.end()){
+        int size = mult.size();
         int checkzero = distance(mult.begin(),it);
-        for(int i =0; i <mult.size()-checkzero;i++){
+        for(int i =0; i <size-checkzero;i++){
         multresult.push_back(mult.at(i+checkzero));
     }
     }
