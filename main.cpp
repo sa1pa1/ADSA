@@ -35,161 +35,162 @@ int counter =1;
     }
     return sum;
 }
-// //SUBTRACTION IMPLEMENTATION FOR KARATSUBA
-// vector<int> SubtractSchool(vector<int> i1, vector<int> i2, int b){
-//     int carry = 0;
-//     vector<int> sub;
-//     int temp;
-//     int length;
+//SUBTRACTION IMPLEMENTATION FOR KARATSUBA
+vector<int> SubtractSchool(vector<int> i1, vector<int> i2, int b){
+    int carry = 0;
+    vector<int> sub;
+    int temp;
+    int length;
 
-//    if(i1.size()>i2.size()){
-//         int difference=i1.size()-i2.size();
-//         i2.insert(i2.begin(),difference,0);
-//         length = i1.size();
-//     } else {
-//         int difference=i2.size()-i1.size();
-//         i1.insert(i1.begin(),difference,0);
-//         length = i2.size();
-//     }
+   if(i1.size()>i2.size()){
+        int difference=i1.size()-i2.size();
+        i2.insert(i2.begin(),difference,0);
+        length = i1.size();
+    } else {
+        int difference=i2.size()-i1.size();
+        i1.insert(i1.begin(),difference,0);
+        length = i2.size();
+    }
 
-//     for(int i =length -1;i>=0;i++){
-//         temp = i1.at(i) - i2.at(i) - carry;
-//         if(temp<0){
-//             sub.insert(sub.begin(), temp+b);
-//             carry=1;
-//         } else {
-//             sub.insert(sub.begin(),temp);
-//             carry=0;
+    for(int i =length -1;i>=0;i++){
+        temp = i1.at(i) - i2.at(i) - carry;
+        if(temp<0){
+            sub.insert(sub.begin(), temp+b);
+            carry=1;
+        } else {
+            sub.insert(sub.begin(),temp);
+            carry=0;
 
-//         }
-//     }
-// return sub;
-// }
+        }
+    }
+return sub;
+}
 
-// vector<int> MultiplySchool(vector<int> i1, vector<int> i2, int b){
-// 	int temp=0;
-// 	int carry=0;
-//     vector<int> mult;
-// 	vector<int> result;
+vector<int> MultiplySchool(vector<int> i1, vector<int> i2, int b){
+	int temp=0;
+	int carry=0;
+    vector<int> mult;
+	vector<int> result;
 
-//  	reverse(i1.begin(),i1.end());
-//     reverse(i2.begin(),i2.end());
-//     result.clear();
-//     //larger number in length on top
-// 	if(i1.size()<i2.size()){
-// 		i1.swap(i2);
-// 	}
-//     int size1 = i1.size();
-//     int size2 = i2.size();
+ 	reverse(i1.begin(),i1.end());
+    reverse(i2.begin(),i2.end());
+    result.clear();
+    //larger number in length on top
+	if(i1.size()<i2.size()){
+		i1.swap(i2);
+	}
+    int size1 = i1.size();
+    int size2 = i2.size();
     
-// 	for(int i=0; i<size2;i++){
-// 		for(int j=0;j<size1;j++){
-// 			temp=i1[j]*i2[i]+carry;
-// 			if(temp>=b){
-// 				mult.push_back(temp%b);
-// 				carry=((temp-(temp)%b)/b);
-// 			}
+	for(int i=0; i<size2;i++){
+		for(int j=0;j<size1;j++){
+			temp=i1[j]*i2[i]+carry;
+			if(temp>=b){
+				mult.push_back(temp%b);
+				carry=((temp-(temp)%b)/b);
+			}
             
-//             else {
-// 			mult.push_back(temp%b);
-// 			carry=0;
-// 			}
-// 		}
-// 		if(carry>0){
-// 			mult.push_back(carry);
-// 		} 
+            else {
+			mult.push_back(temp%b);
+			carry=0;
+			}
+		}
+		if(carry>0){
+			mult.push_back(carry);
+		} 
         
-// 		for(int k = 0; k<i;k++){
-// 			mult.insert(mult.begin(),0);
-// 		}
-//         reverse(mult.begin(),mult.end());
-// 		result= AdditionSchool(mult, result, b);
-// 		mult.clear();
+		for(int k = 0; k<i;k++){
+			mult.insert(mult.begin(),0);
+		}
+        reverse(mult.begin(),mult.end());
+		result= AdditionSchool(mult, result, b);
+		mult.clear();
 
-// 	}
-// 	return result;
-// }
+	}
+	return result;
+}
 
-// vector<int> Karatsuba(vector<int> i1, vector<int> i2, int b){
-// if (i1.size()<i2.size()){
-//     int difference = i2.size()-i1.size();
-//     i1.insert(i1.begin(),difference,0);
+vector<int> Karatsuba(vector<int> i1, vector<int> i2, int b){
+//when reaches base case n=1;
+if (i1.size()==1 || i2.size()==1){
+    vector<int> results;
+    unsigned long long mult, int1 = 0, int2 = 0;
+    int size1 = i1.size();
+    int size2 = i2.size();
 
-// } else {
-//     int difference = i1.size()-i2.size();
-//     i2.insert(i2.begin(),difference, 0);
-// }
+        for(int i=0 ; i<size1;i++){
+            int1 = b*int1 + i1.at(i);
+        }
+        for(int i=0 ; i<size2; i++){
+            int2 = b*int2+ i2.at(i);
+        }
+        mult = int1*int2;
 
-// //when reaches base case n=1;
-// if (i1.size()==1 || i2.size()==1){
-//     vector<int> results;
-//     unsigned long long mult, int1 = 0, int2 = 0;
-//     int size1 = i1.size();
-//     int size2 = i2.size();
+        while (mult>0){
+            results.push_back(mult%b);
+            mult=mult/b;
+        }
 
-//         for(int i=0 ; i<size1;i++){
-//             int1 = b*int1 + i1.at(i);
-//         }
-//         for(int i=0 ; i<size2; i++){
-//             int2 = b*int2+ i2.at(i);
-//         }
-//         mult = int1*int2;
+        reverse(results.begin(),results.end());
+        return results;
+}
+if (i1.size()<i2.size()){
+    int difference = i2.size()-i1.size();
+    i1.insert(i1.begin(),difference,0);
 
-//         while (mult>0){
-//             results.push_back(mult%b);
-//             mult=mult/b;
-//         }
+} else {
+    int difference = i1.size()-i2.size();
+    i2.insert(i2.begin(),difference, 0);
+}
 
-//         reverse(results.begin(),results.end());
-//         return results;
-// }
-// //dividing into a0,a1,b0,b1
-// int n = max(i1.size(),i2.size());
 
-// if (n<4){
-//     vector<int> result;
-//     result = MultiplySchool(i1,i2,b);
-//     return result;
+//dividing into a0,a1,b0,b1
+int n = max(i1.size(),i2.size());
 
-// }else {
+if (n<4){
+    vector<int> result;
+    result = MultiplySchool(i1,i2,b);
+    return result;
 
-// int k = (int)floor(n/2);
-// int subarr = (int)ceil(n/2);
+}else {
 
-// vector<int> a1;
-// vector<int> a0;
-// int size1 = i1.size();
+int k = (int)floor(n/2);
+int subarr = (int)ceil(n/2);
 
-// for (int i =0; i<subarr;i++){
-//     a1.push_back(i1.at(i));
-// }
+vector<int> a1;
+vector<int> a0;
+int size1 = i1.size();
 
-// for (int i = subarr; i <size1;i++){
-//     a0.push_back(i1.at(i));
-// }
+for (int i =0; i<subarr;i++){
+    a1.push_back(i1.at(i));
+}
 
-// vector<int>b1;
-// vector<int>b0;
-// int size2 = i2.size();
+for (int i = subarr; i <size1;i++){
+    a0.push_back(i1.at(i));
+}
 
-// for (int i = 0; i<subarr; i++){
-//     b1.push_back(i2.at(i));
-// }
+vector<int>b1;
+vector<int>b0;
+int size2 = i2.size();
 
-// for (int i = subarr; i <size2; i++){
-//     b0.push_back(i2.at(i));
-// }
-// vector<int> p0 = Karatsuba(a0,b0,b);
-// vector<int> p1 = Karatsuba(AdditionSchool(a1,a0,b),AdditionSchool(b1,b0,b),b);
-// vector<int> p2 = Karatsuba(a1,b1,b);
-// fill_n(p2.begin(), k * 2, 0);
-// vector<int> p3 = SubtractSchool(p1,AdditionSchool(p2,p0,b),b);
-// fill_n(p3.begin(), k,0);
+for (int i = 0; i<subarr; i++){
+    b1.push_back(i2.at(i));
+}
 
-// vector<int> result = AdditionSchool(p0,AdditionSchool(p2,p3,b),b);
-// return result;
-// }
-// }
+for (int i = subarr; i <size2; i++){
+    b0.push_back(i2.at(i));
+}
+vector<int> p0 = Karatsuba(a0,b0,b);
+vector<int> p1 = Karatsuba(AdditionSchool(a1,a0,b),AdditionSchool(b1,b0,b),b);
+vector<int> p2 = Karatsuba(a1,b1,b);
+fill_n(p2.begin(), k * 2, 0);
+vector<int> p3 = SubtractSchool(p1,AdditionSchool(p2,p0,b),b);
+fill_n(p3.begin(), k,0);
+
+vector<int> result = AdditionSchool(p0,AdditionSchool(p2,p3,b),b);
+return result;
+}
+}
 //PRINT RESULT
 void print(vector<int> number){
     int size = number.size();
@@ -227,23 +228,23 @@ int main(){
     }
    
     vector<int> addition = AdditionSchool(no1,no2,base);
-    // vector<int> mult = Karatsuba(no1,no2,base);
-    // vector<int> multresult;
-    // auto it = std::find_if(mult.begin(), mult.end(), [](int nonzero){
-    //     return nonzero !=0;
-    // });
+    vector<int> mult = Karatsuba(no1,no2,base);
+    vector<int> multresult;
+    auto it = std::find_if(mult.begin(), mult.end(), [](int nonzero){
+        return nonzero !=0;
+    });
     
-    // if (it!=mult.end()){
-    //     int size = mult.size();
-    //     int checkzero = distance(mult.begin(),it);
-    //     for(int i =0; i <size-checkzero;i++){
-    //     multresult.push_back(mult.at(i+checkzero));
-    // }
-    // }
+    if (it!=mult.end()){
+        int size = mult.size();
+        int checkzero = distance(mult.begin(),it);
+        for(int i =0; i <size-checkzero;i++){
+        multresult.push_back(mult.at(i+checkzero));
+    }
+    }
 
     print(addition);
     std::cout<<" ";
-    // print(multresult);
+    print(multresult);
     std::cout<<" "<<0; // division result 
     //printVector(simple);
     return 0;
