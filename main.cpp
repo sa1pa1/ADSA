@@ -72,6 +72,9 @@ vector<int> MultiplySchool(vector<int> i1, vector<int> i2, int b){
     vector<int> mult;
 	vector<int> result;
 
+ 	reverse(i1.begin(),i1.end());
+    reverse(i2.begin(),i2.end());
+    result.clear();
     //larger number in length on top
 	if(i1.size()<i2.size()){
 		i1.swap(i2);
@@ -118,7 +121,7 @@ if (i1.size()<i2.size()){
 //when reaches base case n=1;
 if (i1.size()==1 || i2.size()==1){
     vector<int> results;
-    unsigned long mult, int1 = 0, int2 = 0;
+    unsigned long long mult, int1 = 0, int2 = 0;
 
         for(int i=0 ; i<i1.size();i++){
             int1 = b*int1 + i1.at(i);
@@ -144,8 +147,7 @@ if (n<4){
     result = MultiplySchool(i1,i2,b);
     return result;
 
-}
-else{
+}else {
 
 int k = (int)floor(n/2);
 int subarr = (int)ceil(n/2);
