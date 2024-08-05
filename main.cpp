@@ -79,9 +79,11 @@ vector<int> MultiplySchool(vector<int> i1, vector<int> i2, int b){
 	if(i1.size()<i2.size()){
 		i1.swap(i2);
 	}
+    int size1 = i1.size();
+    int size2 = i2.size();
     
-	for(int i=0; i<i2.size();i++){
-		for(int j=0;j<i1.size();j++){
+	for(int i=0; i<size2;i++){
+		for(int j=0;j<size1;j++){
 			temp=i1[j]*i2[i]+carry;
 			if(temp>=b){
 				mult.push_back(temp%b);
@@ -223,7 +225,7 @@ int main(){
     vector<int> multresult;
 
 
-    auto it = find_if(mult.begin(), mult.end(), [](int nonzero){
+    auto it = std::find_if(mult.begin(), mult.end(), [](int nonzero){
         return nonzero !=0;
     });
     
@@ -235,9 +237,9 @@ int main(){
     }
 
     print(addition);
-    cout<<" ";
+    std::cout<<" ";
     print(multresult);
-    cout<<" "<<0; // division result 
+    std::cout<<" "<<0; // division result 
     //printVector(simple);
     return 0;
 }
