@@ -6,11 +6,7 @@
 #include <algorithm>
 
 using namespace std;
-void printVector(vector<int> number){
-    for(int i =0; i <number.size();i++){
-        cout<<number.at(i);
-    }
-}
+
 int counter =1;
 //school method addition I1 and I2
  vector<int> AdditionSchool(vector<int> i1, vector<int> i2, int b){
@@ -70,6 +66,45 @@ vector<int> SubtractSchool(vector<int> i1, vector<int> i2, int b){
 return sub;
 }
 
+vector<int> MultiplySchool(vector<int> i1, vector<int> i2, int b){
+	int temp=0;
+	int carry=0;
+    vector<int> mult;
+	vector<int> result;
+
+    //larger number in length on top
+	if(i1.size()<i2.size()){
+		i1.swap(i2);
+	}
+    
+	for(int i=0; i<i2.size();i++){
+		for(int j=0;j<i1.size();j++){
+			temp=i1[j]*i2[i]+carry;
+			if(temp>=b){
+				mult.push_back(temp%b);
+				carry=((temp-(temp)%b)/b);
+			}
+            
+            else {
+			mult.push_back(temp%b);
+			carry=0;
+			}
+		}
+		if(carry>0){
+			mult.push_back(carry);
+		} 
+        
+		for(int k = 0; k<i;k++){
+			mult.insert(mult.begin(),0);
+		}
+        reverse(mult.begin(),mult.end());
+		result= AdditionSchool(mult, result, b);
+		mult.clear();
+
+	}
+	return result;
+}
+
 vector<int> Karatsuba(vector<int> i1, vector<int> i2, int b){
 if (i1.size()<i2.size()){
     int difference = i2.size()-i1.size();
@@ -103,16 +138,61 @@ if (i1.size()==1 || i2.size()==1){
 }
 //dividing into a0,a1,b0,b1
 int n = max(i1.size(),i2.size());
+
+if (n<4){
+    vector<int> result;
+    result = MultiplySchool(i1,i2,b);
+    return result;
+
+}
+else{
+
 int k = (int)floor(n/2);
 int subarr = (int)ceil(n/2);
 
+vector<int> a1;
+vector<int> a0;
 
+for (int i =0; i<subarr;i++){
+    a1.push_back(i1.at(i));
 }
+
+for (int i = subarr; i <i1.size();i++){
+    a0.push_back(i1.at(i));
+}
+
+vector<int>b1;
+vector<int>b0;
+
+for (int i = 0; i<subarr; i++){
+    b1.push_back(i2.at(i));
+}
+for (int i = subarr; i <i2.size(); i++){
+    b0.push_back(i2.at(i));
+}
+vector<int> p0 = Karatsuba(a0,b0,b);
+vector<int> p1 = Karatsuba(AdditionSchool(a1,a0,b),AdditionSchool(b1,b0,b),b);
+vector<int> p2 = Karatsuba(a1,b1,b);
+fill_n(p2.begin(), k * 2, 0);
+vector<int> p3 = SubtractSchool(p1,AdditionSchool(p2,p0,b),b);
+fill_n(p3.begin(), k,0);
+
+vector<int> result = AdditionSchool(p0,AdditionSchool(p2,p3,b),b);
+return result;
+}
+}
+//PRINT RESULT
+void print(vector<int> number){
+    for(int i =0; i <number.size();i++){
+        cout<<number.at(i);
+    }
+}
+
 int main(){
         string str;
     getline(cin,str);
-    vector<int> number1; //first vector to store number
-    vector<int> number2; //second vector to store number
+    vector<int> no1; //first vector to store number
+    vector<int> no2; //second vector to store number
     int base;
     int counter;
     int stringSize=str.size();
@@ -125,10 +205,10 @@ int main(){
             str.erase(0, 1);
         }
         if(counter==0){
-            number1.push_back(str.at(0)-48);
+            no1.push_back(str.at(0)-48);
             str.erase(0, 1);
         } else if (counter==1){
-            number2.push_back(str.at(0)-48);
+            no2.push_back(str.at(0)-48);
             str.erase(0, 1);
         } else{
             stringstream iss(str);
@@ -136,10 +216,26 @@ int main(){
         }
     }
    
-    vector<int> addition = AdditionSchool(number1,number2,base);
+    vector<int> addition = AdditionSchool(no1,no2,base);
+    vector<int> mult = Karatsuba(no1,no2,base);
+    vector<int> multresult;
 
-    //printVector(sub);
-    printVector(addition);
+
+    auto it = find_if(mult.begin(), mult.end(), [](int nonzero){
+        return nonzero !=0;
+    });
+    
+    if (it!=mult.end()){
+        int checkzero = distance(mult.begin(),it);
+        for(int i =0; i <mult.size()-checkzero;i++){
+        multresult.push_back(mult.at(i+checkzero));
+    }
+    }
+
+    print(addition);
+    cout<<" ";
+    print(multresult);
+    cout<<" "<<0; // division result 
     //printVector(simple);
     return 0;
 }
