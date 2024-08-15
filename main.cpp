@@ -37,9 +37,9 @@ int counter =1;
 }
 //SUBTRACTION IMPLEMENTATION FOR KARATSUBA
 vector<int> SubtractSchool(vector<int> i1, vector<int> i2, int b){
+      vector<int> sub;
     int carry = 0;
-    vector<int> sub;
-    int temp;
+    int temp=0;
     int length;
 
    if(i1.size()>i2.size()){
@@ -52,7 +52,7 @@ vector<int> SubtractSchool(vector<int> i1, vector<int> i2, int b){
         length = i2.size();
     }
 
-    for(int i =length -1;i>=0;i++){
+    for(int i =length -1;i>=0;i--){
         temp = i1.at(i) - i2.at(i) - carry;
         if(temp<0){
             sub.insert(sub.begin(), temp+b);
@@ -97,6 +97,7 @@ vector<int> MultiplySchool(vector<int> i1, vector<int> i2, int b){
 		}
 		if(carry>0){
 			mult.push_back(carry);
+            carry =0;
 		} 
         
 		for(int k = 0; k<i;k++){
@@ -134,63 +135,65 @@ if (i1.size()==1 || i2.size()==1){
         reverse(results.begin(),results.end());
         return results;
 }
-if (i1.size()<i2.size()){
-    int difference = i2.size()-i1.size();
-    i1.insert(i1.begin(),difference,0);
+if (i1.size()>i2.size()){
+    int difference = i1.size()-i2.size();
+    i2.insert(i2.begin(),difference,0);
 
 } else {
-    int difference = i1.size()-i2.size();
-    i2.insert(i2.begin(),difference, 0);
+    int difference = i2.size()-i1.size();
+    i1.insert(i1.begin(),difference, 0);
 }
 
 
 //dividing into a0,a1,b0,b1
 int n = max(i1.size(),i2.size());
 
-// if (n<4){
-//     vector<int> result;
-//     result = MultiplySchool(i1,i2,b);
-//     return result;
+if (n<4){
+    vector<int> result;
+    result = MultiplySchool(i1,i2,b);
+    return result;
 
-// }else {
-
-int k = (int)floor(n/2);
-int subarr = (int)ceil(n/2);
+}else {
+int k = (int)floor(n/2.0);
+int subarr = (int)ceil(n/2.0);
 
 vector<int> a1;
 vector<int> a0;
-int size1 = i1.size();
 
 for (int i =0; i<subarr;i++){
     a1.push_back(i1.at(i));
 }
-
-for (int i = subarr; i <size1;i++){
+for (int i = subarr; i <i1.size();i++){
     a0.push_back(i1.at(i));
 }
 
 vector<int>b1;
 vector<int>b0;
-int size2 = i2.size();
 
 for (int i = 0; i<subarr; i++){
     b1.push_back(i2.at(i));
 }
-
-for (int i = subarr; i <size2; i++){
+for (int i = subarr; i <i2.size(); i++){
     b0.push_back(i2.at(i));
 }
+    
 vector<int> p0 = Karatsuba(a0,b0,b);
 vector<int> p1 = Karatsuba(AdditionSchool(a1,a0,b),AdditionSchool(b1,b0,b),b);
 vector<int> p2 = Karatsuba(a1,b1,b);
-fill_n(p2.begin(), k * 2, 0);
+
 vector<int> p3 = SubtractSchool(p1,AdditionSchool(p2,p0,b),b);
-fill_n(p3.begin(), k,0);
+
+for(int i =0; i <k*2;i++){
+        p2.push_back(0);
+    }
+ for(int i=0 ; i<k ; i++){
+        p3.push_back(0);
+    }
 
 vector<int> result = AdditionSchool(p0,AdditionSchool(p2,p3,b),b);
 return result;
-}
-// }
+}}
+
 //PRINT RESULT
 void print(vector<int> number){
     int size = number.size();
@@ -244,7 +247,7 @@ int main(){
 
     print(addition);
     std::cout<<" ";
-    print(multresult);
+    print(multresult); //karatsuba result 
     std::cout<<" "<<0; // division result 
     //printVector(simple);
     return 0;
