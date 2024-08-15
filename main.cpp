@@ -113,28 +113,29 @@ vector<int> MultiplySchool(vector<int> i1, vector<int> i2, int b){
 
 vector<int> Karatsuba(vector<int> i1, vector<int> i2, int b){
 //when reaches base case n=1;
-if (i1.size()==1 || i2.size()==1){
-    vector<int> results;
-    unsigned long long mult, int1 = 0, int2 = 0;
-    int size1 = i1.size();
-    int size2 = i2.size();
+// if (i1.size()==1 || i2.size()==1){
+//     vector<int> results;
+//     unsigned long long mult, int1 = 0, int2 = 0;
+//     int size1 = i1.size();
+//     int size2 = i2.size();
 
-        for(int i=0 ; i<size1;i++){
-            int1 = b*int1 + i1.at(i);
-        }
-        for(int i=0 ; i<size2; i++){
-            int2 = b*int2+ i2.at(i);
-        }
-        mult = int1*int2;
+//         for(int i=0 ; i<size1;i++){
+//             int1 = b*int1 + i1.at(i);
+//         }
+//         for(int i=0 ; i<size2; i++){
+//             int2 = b*int2+ i2.at(i);
+//         }
+//         mult = int2*int1;
 
-        while (mult>0){
-            results.push_back(mult%b);
-            mult=mult/b;
-        }
+//         while (mult>0){
+//             results.push_back(mult%b);
+//             mult=mult/b;
+//         }
 
-        reverse(results.begin(),results.end());
-        return results;
-}
+//         reverse(results.begin(),results.end());
+//         return results;
+// }
+
 if (i1.size()>i2.size()){
     int difference = i1.size()-i2.size();
     i2.insert(i2.begin(),difference,0);
@@ -192,7 +193,8 @@ for(int i =0; i <k*2;i++){
 
 vector<int> result = AdditionSchool(p0,AdditionSchool(p2,p3,b),b);
 return result;
-}}
+}
+}
 
 //PRINT RESULT
 void print(vector<int> number){
