@@ -132,6 +132,8 @@ if (n<4){
     return result;
 
 }else {
+int sizeno1 = i1.size();  // fix gradescope error
+int sizeno2 = i2.size();
 int k = (int)floor(n/2.0);
 int subarr = (int)ceil(n/2.0);
 
@@ -141,7 +143,7 @@ vector<int> a0;
 for (int i =0; i<subarr;i++){
     a1.push_back(i1.at(i));
 }
-for (int i = subarr; i <i1.size();i++){
+for (int i = subarr; i <sizeno1;i++){
     a0.push_back(i1.at(i));
 }
 
@@ -151,7 +153,7 @@ vector<int>b0;
 for (int i = 0; i<subarr; i++){
     b1.push_back(i2.at(i));
 }
-for (int i = subarr; i <i2.size(); i++){
+for (int i = subarr; i <sizeno2; i++){
     b0.push_back(i2.at(i));
 }
     
@@ -161,12 +163,8 @@ vector<int> p2 = Karatsuba(a1,b1,b);
 
 vector<int> p3 = SubtractSchool(p1,AdditionSchool(p2,p0,b),b);
 
-for(int i =0; i <k*2;i++){
-        p2.push_back(0);
-    }
- for(int i=0 ; i<k ; i++){
-        p3.push_back(0);
-    }
+p2.insert(p2.end(), k * 2, 0);
+ p3.insert(p3.end(), k, 0); 
 
 vector<int> result = AdditionSchool(p0,AdditionSchool(p2,p3,b),b);
 return result;
@@ -182,7 +180,7 @@ void print(vector<int> number){
 }
 
 int main(){
-        string str;
+    string str;
     getline(cin,str);
     vector<int> no1; //first vector to store number
     vector<int> no2; //second vector to store number
