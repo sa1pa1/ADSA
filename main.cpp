@@ -75,7 +75,7 @@ Node* AVLTree::rightrotate(Node* y){
     y->height= max(get_height(y->left), get_height(y->right))+1;
     x->height= max(get_height(x->left), get_height(x->right)) + 1;
 
-    return y;
+    return x;
 }
 
 //get minimum value in substree, most left node
@@ -105,10 +105,7 @@ Node* AVLTree::Aint(Node* node, int k){
     node -> height = max(get_height(node->left), get_height(node->right))+1;
 
 
-    int balancefactor = get_height(node->left) - get_height(node->right);
-    if (node == nullptr){
-        balancefactor = 0;
-    }
+    int balancefactor = balance_factor(node);
 
     //rebalance tree
     //CASE 1: left left
@@ -168,20 +165,17 @@ Node* AVLTree::Dint(Node* root, int k){
     }
     root->height = max(get_height(root->left), get_height(root->right))+1;
 
-    int balancefactor = get_height(root->left) - get_height(root->right);
-    if (root == nullptr){
-        balancefactor = 0;
-    }
+    int balancefactor = balance_factor(root);
     
     //rebalance tree
     //CASE 1: left left
     if (balancefactor > 1 && balance_factor(root->left)>=0){
         return rightrotate(root);
-
     }
     //CASE 2: right right
-     if (balancefactor < -1 && balance_factor(root->right) <= 0)
+     if (balancefactor < -1 && balance_factor(root->right) <= 0){
         return leftrotate(root);
+        }
     //CASE 3: left right 
     if (balancefactor > 1 && balance_factor(root->left) < 0) {
             root->left = leftrotate(root->left);
@@ -250,7 +244,7 @@ int main() {
 
 
     vector<string> cmds = parse_input(input);
-    for (int i = 0; i < cmds.size() - 1; i++) {
+    for (size_t i = 0; i < cmds.size() - 1; i++) {
         string cmd = cmds[i];
         if (cmd[0] == 'A') {
             int val = stoi(cmd.substr(1));
