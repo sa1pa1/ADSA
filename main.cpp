@@ -126,91 +126,61 @@ Node* AVLTree::Aint(Node* node, int k) {
     return node;
 }
 
+//DELETE
 Node* AVLTree::Dint(Node* root, int k) {
     if (root == nullptr) {
         return root;
     }
 
-    // Standard BST delete logic
     if (k < root->k) {
         root->left = Dint(root->left, k);
     } else if (k > root->k) {
         root->right = Dint(root->right, k);
     } else {
-        // Node with one child or no child
         if ((root->left == nullptr) || (root->right == nullptr)) {
             Node* temp = root->left ? root->left : root->right;
 
-            // No child case
             if (temp == nullptr) {
                 temp = root;
                 root = nullptr;
-            }
-            // One child case
-            else {
-                *root = *temp;
-            }
+            } else{
+                *root = *temp;}
             delete temp;
         } else {
-            // Node with two children: Get the inorder successor (smallest in the right subtree)
             Node* temp = getminNode(root->right);
             root->k = temp->k;
             root->right = Dint(root->right, temp->k);
         }
     }
 
-    // If the tree had only one node, return
     if (root == nullptr) {
         return root;
     }
-
-    // Update the height of the current node
     root->height = max(get_height(root->left), get_height(root->right)) + 1;
-
-    // Get the balance factor
     int balancefactor = balance_factor(root);
 
-    // Rebalance the tree
-    // CASE 1: Left Left (LL)
-    if (balancefactor > 1 && balance_factor(root->left) >= 0) {
+    //rebalance tree
+    //CASE 1: left left
+    if (balancefactor > 1 && k < root->left->k) {
         return rightrotate(root);
     }
-
-    // CASE 2: Left Right (LR)
-    if (balancefactor > 1 && balance_factor(root->left) < 0) {
-        root->left = leftrotate(root->left);
-        return rightrotate(root);
-    }
-
-    // CASE 3: Right Right (RR)
-    if (balancefactor < -1 && balance_factor(root->right) <= 0) {
+    //CASE 2: right right
+    if (balancefactor < -1 && k > root->right->k) {
         return leftrotate(root);
     }
-
-    // CASE 4: Right Left (RL)
-    if (balancefactor < -1 && balance_factor(root->right) > 0) {
+    //CASE 3: left right 
+    if (balancefactor > 1 && k > root->left->k) {
+       root->left = leftrotate(root->left);
+        return rightrotate(root);
+    }
+    //CASE 4: right left
+    if (balancefactor < -1 && k < root->right->k) {
         root->right = rightrotate(root->right);
         return leftrotate(root);
     }
-
     return root;
-}
-void printTree(Node* root, string indent = "", bool last = true) {
-    if (root != nullptr) {
-        cout << indent;
-        if (last) {
-            cout << "R----";
-            indent += "   ";
-        } else {
-            cout << "L----";
-            indent += "|  ";
-        }
-        cout << root->k << "(h=" << root->height << ")" << endl;
-        printTree(root->left, indent, false);
-        printTree(root->right, indent, true);
-    }
-}
 
+}
 
 // Pre-order traversal
 void AVLTree::PRE(Node* root) {
@@ -265,27 +235,25 @@ int main() {
     string input;
     getline(cin, input);
 
+
     vector<string> cmds = parse_input(input);
     for (size_t i = 0; i < cmds.size() - 1; i++) {
         string cmd = cmds[i];
         if (cmd[0] == 'A') {
             int val = stoi(cmd.substr(1));
-            if (val < 1 || val > 100) {
-                cout << "Please insert values from 1 - 100" << endl;
+            if (val < 1 || val > 100){
+                cout<<"Please insert values from 1 - 100"<<endl;
                 return -1;
+                
             }
             root = AVLTree.Aint(root, val);
-            cout << "After inserting " << val << ":" << endl;
-            printTree(root);
         } else if (cmd[0] == 'D') {
             int val = stoi(cmd.substr(1));
             root = AVLTree.Dint(root, val);
-            cout << "After deleting " << val << ":" << endl;
-            printTree(root);
         }
+       
     }
-
-    //check last command for traversal conditions.
+    //check last command for order conditions. 
     string final_command = cmds.back();
 
     if (final_command == "PRE") {
