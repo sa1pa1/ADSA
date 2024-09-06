@@ -78,14 +78,15 @@ Node* AVLTree::rightrotate(Node* y){
     return x;
 }
 
-//get minimum value in substree, most left node
-Node* AVLTree::getminNode(Node* node){
+Node* AVLTree::getminNode(Node* node) {
+    if (node == nullptr) return nullptr; // Handle case where node is null
     Node* current = node;
-    while (current->left!=nullptr){
+    while (current->left != nullptr) {
         current = current->left;
     }
     return current;
 }
+
 
 //INSERT AINT()
 Node* AVLTree::Aint(Node* node, int k){
@@ -150,8 +151,8 @@ Node* AVLTree::Dint(Node* root, int k){
             if (temp == nullptr) {
                 temp = root;
                 root = nullptr;
-            } else
-                *root = *temp; 
+            } else{
+                *root = *temp; }
             delete temp;
         } else {
             Node* temp = getminNode(root->right);
@@ -179,12 +180,12 @@ Node* AVLTree::Dint(Node* root, int k){
     //CASE 3: left right 
     if (balancefactor > 1 && balance_factor(root->left) < 0) {
             root->left = leftrotate(root->left);
-            return rightrotate(root->left);
+            return rightrotate(root);
         }
     //CASE 4 right left 
     if (balancefactor < -1 && balance_factor(root->right) > 0){
         root->right = rightrotate(root->right);
-        return leftrotate(root->right);
+        return leftrotate(root);
     }
     return root;
 }
