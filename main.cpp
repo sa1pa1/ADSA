@@ -1,8 +1,7 @@
 #include <iostream>
 #include <string>
-#include <sstream>
 #include <vector>
-#include <algorithm>
+#include <cstdlib>
 using namespace std;
 
 struct Node{
@@ -223,6 +222,24 @@ void AVLTree::POST(Node* root) {
     }
 }
 
+vector <string> parse_input(const string& input){
+    vector<string> result;
+    string temp = "";
+    for (char c : input) {
+        if (c == ' ') {
+            if (!temp.empty()) {
+                result.push_back(temp);
+                temp.clear();
+            }
+        } else {
+            temp += c;
+        }
+    }
+    if (!temp.empty()) {
+        result.push_back(temp);
+    }
+    return result;
+}
 
 int main() {
     AVLTree AVLTree;
@@ -231,11 +248,10 @@ int main() {
     string input;
     getline(cin, input);
 
-    istringstream iss(input);
-    vector<string> commands((istream_iterator<string>(iss)), istream_iterator<string>());
-    
-    for (int i = 0; i < commands.size() - 1; i++) {
-        string cmd = commands[i];
+
+    vector<string> cmds = parse_input(input);
+    for (int i = 0; i < cmds.size() - 1; i++) {
+        string cmd = cmds[i];
         if (cmd[0] == 'A') {
             int val = stoi(cmd.substr(1));
             if (val < 1 || val > 100){
@@ -251,7 +267,7 @@ int main() {
        
     }
     //check last command for order conditions. 
-    string final_command = commands.back();
+    string final_command = cmds.back();
 
     if (final_command == "PRE") {
         if (root == nullptr)
