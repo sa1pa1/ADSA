@@ -27,6 +27,7 @@ public:
     int get_height(Node* node);
     int balance_factor(Node* node);
 
+
 private:
     Node* leftrotate(Node* node);
     Node* rightrotate(Node* node);
@@ -143,8 +144,8 @@ Node* AVLTree::Dint(Node* root, int k) {
             if (temp == nullptr) {
                 temp = root;
                 root = nullptr;
-            } else{
-                *root = *temp;}
+            } else
+                *root = *temp;
             delete temp;
         } else {
             Node* temp = getminNode(root->right);
@@ -157,6 +158,7 @@ Node* AVLTree::Dint(Node* root, int k) {
         return root;
     }
     root->height = max(get_height(root->left), get_height(root->right)) + 1;
+
     int balancefactor = balance_factor(root);
 
     //rebalance tree
