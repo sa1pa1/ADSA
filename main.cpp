@@ -4,21 +4,21 @@
 #include <cstdlib>
 using namespace std;
 
-struct Node{
+struct Node {
     int k;
     Node* left;
     Node* right;
     int height;
-    Node(int val){
+    Node(int val) {
         k = val;
-        left =nullptr;
+        left = nullptr;
         right = nullptr;
         height = 1;
     }
 };
 
-class AVLTree{
-    public: 
+class AVLTree {
+public:
     Node* Aint(Node* node, int k);
     Node* Dint(Node* root, int k);
     void PRE(Node* root);
@@ -35,15 +35,15 @@ private:
 
 //public implementations
 
-int AVLTree::get_height(Node* node){
-    if (node==nullptr){
+int AVLTree::get_height(Node* node) {
+    if (node == nullptr) {
         return 0;
     }
     return node->height;
 }
 
-int AVLTree::balance_factor(Node* node){
-     if (node==nullptr){
+int AVLTree::balance_factor(Node* node) {
+    if (node == nullptr) {
         return 0;
     }
     return get_height(node->left) - get_height(node->right);
@@ -51,143 +51,166 @@ int AVLTree::balance_factor(Node* node){
 
 //private implementations 
 //left rotate: 
-Node* AVLTree::leftrotate(Node* x){
+Node* AVLTree::leftrotate(Node* x) {
     Node* y = x->right;
-    Node* T = y->left;
+    Node* T2 = y->left;
 
     y->left = x;
-    x->right = T;
+    x->right = T2;
 
-    x->height= max(get_height(x->left), get_height(x->right)) + 1;
-    y->height= max(get_height(y->left), get_height(y->right))+1;
+    x->height = max(get_height(x->left), get_height(x->right)) + 1;
+    y->height = max(get_height(y->left), get_height(y->right)) + 1;
 
     return y;
 }
 
 //right rotate:
-Node* AVLTree::rightrotate(Node* y){
+Node* AVLTree::rightrotate(Node* y) {
     Node* x = y->left;
-    Node* T = x->right;
+    Node* T2 = x->right;
 
-    y->left = T;
+    y->left = T2;
     x->right = y;
 
-    y->height= max(get_height(y->left), get_height(y->right))+1;
-    x->height= max(get_height(x->left), get_height(x->right)) + 1;
+    y->height = max(get_height(y->left), get_height(y->right)) + 1;
+    x->height = max(get_height(x->left), get_height(x->right)) + 1;
 
     return x;
 }
 
-//get minimum value in substree, most left node
-Node* AVLTree::getminNode(Node* node){
+//get minimum value in subtree, most left node
+Node* AVLTree::getminNode(Node* node) {
     Node* current = node;
-    while (current->left!=nullptr){
+    while (current->left != nullptr) {
         current = current->left;
     }
     return current;
 }
 
 //INSERT AINT()
-Node* AVLTree::Aint(Node* node, int k){
-    if (node == nullptr){
+Node* AVLTree::Aint(Node* node, int k) {
+    if (node == nullptr) {
         return new Node(k);
     }
 
-    if (k< node->k){
-        node->left = Aint(node->left,k);
-    }
-    else if (k > node->k){
-        node->right = Aint(node->right,k);
-    }
-    else return node;
+    if (k < node->k) {
+        node->left = Aint(node->left, k);
+    } else if (k > node->k) {
+        node->right = Aint(node->right, k);
+    } else return node;
 
-
-    node -> height = max(get_height(node->left), get_height(node->right))+1;
-
+    node->height = max(get_height(node->left), get_height(node->right)) + 1;
 
     int balancefactor = balance_factor(node);
 
     //rebalance tree
     //CASE 1: left left
-    if (balancefactor >1 && k < node->left->k){
+    if (balancefactor > 1 && k < node->left->k) {
         return rightrotate(node);
     }
     //CASE 2: right right
-    if (balancefactor < -1 && k > node->right->k){
+    if (balancefactor < -1 && k > node->right->k) {
         return leftrotate(node);
     }
     //CASE 3: left right 
-    if (balancefactor > 1 && k > node->left->k){
+    if (balancefactor > 1 && k > node->left->k) {
         node->left = leftrotate(node->left);
         return rightrotate(node);
     }
     //CASE 4: right left
-    if (balancefactor < -1 && k <node->right->k){
+    if (balancefactor < -1 && k < node->right->k) {
         node->right = rightrotate(node->right);
         return leftrotate(node);
     }
 
-return node;
-
+    return node;
 }
 
-//DELETE
-Node* AVLTree::Dint(Node* root, int k){
-    if (root == nullptr){
+Node* AVLTree::Dint(Node* root, int k) {
+    if (root == nullptr) {
         return root;
     }
 
-    if (k <root->k){
-        root->left = Dint(root->left,k);
-    }
-    else if(k> root->k){
-        root->right = Dint(root->right,k);
-    }
-    else{
+    // Standard BST delete logic
+    if (k < root->k) {
+        root->left = Dint(root->left, k);
+    } else if (k > root->k) {
+        root->right = Dint(root->right, k);
+    } else {
+        // Node with one child or no child
         if ((root->left == nullptr) || (root->right == nullptr)) {
             Node* temp = root->left ? root->left : root->right;
 
+            // No child case
             if (temp == nullptr) {
                 temp = root;
                 root = nullptr;
-            } else
-                *root = *temp; 
+            }
+            // One child case
+            else {
+                *root = *temp;
+            }
             delete temp;
         } else {
+            // Node with two children: Get the inorder successor (smallest in the right subtree)
             Node* temp = getminNode(root->right);
             root->k = temp->k;
             root->right = Dint(root->right, temp->k);
         }
     }
 
+    // If the tree had only one node, return
     if (root == nullptr) {
         return root;
     }
-    root->height = max(get_height(root->left), get_height(root->right))+1;
 
+    // Update the height of the current node
+    root->height = max(get_height(root->left), get_height(root->right)) + 1;
+
+    // Get the balance factor
     int balancefactor = balance_factor(root);
-    
-    //rebalance tree
-    //CASE 1: left left
-    if (balancefactor > 1 && balance_factor(root->left)>=0){
+
+    // Rebalance the tree
+    // CASE 1: Left Left (LL)
+    if (balancefactor > 1 && balance_factor(root->left) >= 0) {
         return rightrotate(root);
     }
-    //CASE 2: right right
-     if (balancefactor < -1 && balance_factor(root->right) <= 0){
-        return leftrotate(root);
-        }
-    //CASE 3: left right 
+
+    // CASE 2: Left Right (LR)
     if (balancefactor > 1 && balance_factor(root->left) < 0) {
-            root->left = leftrotate(root->left);
-            return rightrotate(root);
-        }
-    //CASE 4 right left 
-    if (balancefactor < -1 && balance_factor(root->right) > 0){
+        root->left = leftrotate(root->left);
+        return rightrotate(root);
+    }
+
+    // CASE 3: Right Right (RR)
+    if (balancefactor < -1 && balance_factor(root->right) <= 0) {
+        return leftrotate(root);
+    }
+
+    // CASE 4: Right Left (RL)
+    if (balancefactor < -1 && balance_factor(root->right) > 0) {
         root->right = rightrotate(root->right);
         return leftrotate(root);
     }
+
     return root;
 }
+void printTree(Node* root, string indent = "", bool last = true) {
+    if (root != nullptr) {
+        cout << indent;
+        if (last) {
+            cout << "R----";
+            indent += "   ";
+        } else {
+            cout << "L----";
+            indent += "|  ";
+        }
+        cout << root->k << "(h=" << root->height << ")" << endl;
+        printTree(root->left, indent, false);
+        printTree(root->right, indent, true);
+    }
+}
+
 
 // Pre-order traversal
 void AVLTree::PRE(Node* root) {
@@ -216,7 +239,7 @@ void AVLTree::POST(Node* root) {
     }
 }
 
-vector <string> parse_input(const string& input){
+vector <string> parse_input(const string& input) {
     vector<string> result;
     string temp = "";
     for (char c : input) {
@@ -242,25 +265,27 @@ int main() {
     string input;
     getline(cin, input);
 
-
     vector<string> cmds = parse_input(input);
     for (size_t i = 0; i < cmds.size() - 1; i++) {
         string cmd = cmds[i];
         if (cmd[0] == 'A') {
             int val = stoi(cmd.substr(1));
-            if (val < 1 || val > 100){
-                cout<<"Please insert values from 1 - 100"<<endl;
+            if (val < 1 || val > 100) {
+                cout << "Please insert values from 1 - 100" << endl;
                 return -1;
-                
             }
             root = AVLTree.Aint(root, val);
+            cout << "After inserting " << val << ":" << endl;
+            printTree(root);
         } else if (cmd[0] == 'D') {
             int val = stoi(cmd.substr(1));
             root = AVLTree.Dint(root, val);
+            cout << "After deleting " << val << ":" << endl;
+            printTree(root);
         }
-       
     }
-    //check last command for order conditions. 
+
+    //check last command for traversal conditions.
     string final_command = cmds.back();
 
     if (final_command == "PRE") {
@@ -268,12 +293,14 @@ int main() {
             cout << "EMPTY" << endl;
         else
             AVLTree.PRE(root);
-    } else if (final_command == "IN") {
+    } 
+    else if (final_command == "IN") {
         if (root == nullptr)
             cout << "EMPTY" << endl;
         else
             AVLTree.IN(root);
-    } else if (final_command == "POST") {
+    } 
+    else if (final_command == "POST") {
         if (root == nullptr)
             cout << "EMPTY" << endl;
         else
