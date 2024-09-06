@@ -170,21 +170,21 @@ Node* AVLTree::Dint(Node* root, int k){
     //rebalance tree
     //CASE 1: left left
     if (balancefactor > 1 && balance_factor(root->left)>=0){
-        return rightrotate(root->left);
+        return rightrotate(root);
     }
     //CASE 2: right right
      if (balancefactor < -1 && balance_factor(root->right) <= 0){
-        return leftrotate(root->right);
+        return leftrotate(root);
         }
     //CASE 3: left right 
     if (balancefactor > 1 && balance_factor(root->left) < 0) {
             root->left = leftrotate(root->left);
-            return rightrotate(root);
+            return rightrotate(root->left);
         }
     //CASE 4 right left 
     if (balancefactor < -1 && balance_factor(root->right) > 0){
         root->right = rightrotate(root->right);
-        return leftrotate(root);
+        return leftrotate(root->right);
     }
     return root;
 }
