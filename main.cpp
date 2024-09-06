@@ -169,26 +169,25 @@ Node* AVLTree::Dint(Node* root, int k){
     
     //rebalance tree
     //CASE 1: left left
-    if (balancefactor >1 && k < root->left->k){
-        return rightrotate(root);
+    if (balancefactor > 1 && balance_factor(root->left)>=0){
+        return rightrotate(root->left);
     }
     //CASE 2: right right
-    if (balancefactor < -1 && k > root->right->k){
-        return leftrotate(root);
-    }
+     if (balancefactor < -1 && balance_factor(root->right) <= 0){
+        return leftrotate(root->right);
+        }
     //CASE 3: left right 
-    if (balancefactor > 1 && k > root->left->k){
-        root->left = leftrotate(root->left);
-        return rightrotate(root);
-    }
-    //CASE 4: right left
-    if (balancefactor < -1 && k <root->right->k){
+    if (balancefactor > 1 && balance_factor(root->left) < 0) {
+            root->left = leftrotate(root->left);
+            return rightrotate(root);
+        }
+    //CASE 4 right left 
+    if (balancefactor < -1 && balance_factor(root->right) > 0){
         root->right = rightrotate(root->right);
         return leftrotate(root);
     }
     return root;
 }
-
 
 // Pre-order traversal
 void AVLTree::PRE(Node* root) {
