@@ -31,7 +31,6 @@ class AVLTree{
 private:
     Node* leftrotate(Node* node);
     Node* rightrotate(Node* node);
-    Node* getminNode(Node* node);
     Node * getmaxNode(Node* node);
 };
 
@@ -53,42 +52,44 @@ int AVLTree::balance_factor(Node* node){
 
 //private implementations 
 //left rotate: 
-Node* AVLTree::leftrotate(Node* x){
-    Node* y = x->right;
-    Node* T = y->left;
+Node* AVLTree::leftrotate(Node* head){
+    Node* newhead = head->right;
+    Node* temp = newhead->left;
 
-    y->left = x;
-    x->right = T;
+    newhead->left = head;
+    head->right = temp;
 
-    x->height= max(get_height(x->left), get_height(x->right)) + 1;
-    y->height= max(get_height(y->left), get_height(y->right))+1;
+    head->height= max(get_height(head->left), get_height(head->right)) + 1;
+    newhead->height= max(get_height(newhead->left), get_height(newhead->right))+1;
 
-    return y;
+    return newhead;
 }
 
 //right rotate:
-Node* AVLTree::rightrotate(Node* y){
-    Node* x = y->left;
-    Node* T = x->right;
+Node* AVLTree::rightrotate(Node* head){
+    Node* newhead = head->left;
+    Node* T = newhead->right;
 
-    y->left = T;
-    x->right = y;
+    head->left = T;
+    newhead->right = head;
 
-    y->height= max(get_height(y->left), get_height(y->right))+1;
-    x->height= max(get_height(x->left), get_height(x->right)) + 1;
+    head->height= max(get_height(head->left), get_height(head->right))+1;
+    newhead->height= max(get_height(newhead->left), get_height(newhead->right)) + 1;
 
-    return x;
+    return newhead;
 }
 
-Node* AVLTree::getmaxNode(Node* node) {
-    if (node == nullptr) return nullptr; 
-    Node* current = node;
-    while (current->right != nullptr) {
-        current = current->right;
+Node* AVLTree::getmaxNode(Node * node){
+    if (node == nullptr){
+        return nullptr;
+    }
+    Node * current = node;
+    while (current -> right !=nullptr){
+        current = current -> right;
+
     }
     return current;
 }
-
 
 //INSERT AINT()
 Node* AVLTree::Aint(Node* node, int k){
@@ -135,72 +136,65 @@ return node;
 }
 
 //DELETE
-// DELETE
-Node* AVLTree::Dint(Node* root, int k) {
-    if (root == nullptr) {
+Node* AVLTree::Dint(Node* root, int k){
+    if (root ==nullptr){
         return root;
     }
 
-    // Search for the node to delete
-    if (k < root->k) {
+    if (k < root->k){
         root->left = Dint(root->left, k);
-    } else if (k > root->k) {
-        root->right = Dint(root->right, k);
-    } else {
+    }
+    else if (k > root->k){
+        root -> right = Dint(root->right,k);
+    }
+    else {
+        if ((root->left == nullptr) || (root->right == nullptr)){
+            Node* temp = root->left ? root->left: root->right;
 
-        //Node has one or no children
-        if ((root->left == nullptr) || (root->right == nullptr)) {
-            Node* temp = root->left ? root->left : root->right;
-
-            if (temp == nullptr) {
+            if (temp == nullptr){
                 temp = root;
                 root = nullptr;
-            } else {
-                *root = *temp; // Copy the child node's contents
+            }
+            else {
+                *root = *temp;
             }
             delete temp;
         } else {
-            // Node has two children
             Node* temp = getmaxNode(root->left);
             root->k = temp->k;
             root->left = Dint(root->left, temp->k);
         }
     }
-    if (root == nullptr) {
+    if (root == nullptr){
         return root;
     }
-
-    // Update the height of the current node
-    root->height = max(get_height(root->left), get_height(root->right)) + 1;
-
-    // Get the balance factor
+    
+    root->height = max(get_height(root->left), get_height(root->right))+1;
     int balancefactor = balance_factor(root);
-
-    // CASE 1: Left Left
-    if (balancefactor > 1 && balance_factor(root->left) >= 0) {
+    
+    //rebalance tree
+    //CASE 1: left left
+    if (balancefactor > 1 && balance_factor(root->left)>=0){
         return rightrotate(root);
     }
-
-    // CASE 2: Right Right
-    if (balancefactor < -1 && balance_factor(root->right) <= 0) {
-        return leftrotate(root);
-    }
-
-    // CASE 3: Left Right
-    if (balancefactor > 1 && balance_factor(root->left) < 0) {
-        root->left = leftrotate(root->left);
-        return rightrotate(root);
-    }
-
-    // CASE 4: Right Left
-    if (balancefactor < -1 && balance_factor(root->right) > 0) {
-        root->right = rightrotate(root->right);
-        return leftrotate(root);
-    }
-
-    return root;
+    //CASE 3: left-right case
+if (balancefactor > 1 && balance_factor(root->left) < 0) {
+    root->left = leftrotate(root->left);
+    return rightrotate(root);
 }
 
+//CASE 4: right-left case
+if (balancefactor < -1 && balance_factor(root->right) > 0) {
+    root->right = rightrotate(root->right);
+    return leftrotate(root);
+}
+
+    //CASE 2: right right
+     if (balancefactor < -1 && balance_factor(root->right) <= 0){
+        return leftrotate(root);
+        }
+    return root;
+}
 
 // Pre-order traversal
 void AVLTree::PRE(Node* root) {
