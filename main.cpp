@@ -173,7 +173,7 @@ Node* AVLTree::Dint(Node* root, int k){
     if (root->left==nullptr){
         leftvalue = 0;
     }
-    else leftvalue =  get_height(root->left) - get_height(root->right);
+    else leftvalue =  get_height(root->right) - get_height(root->left);
    
    int rightvalue; 
    if (root->right == nullptr){
