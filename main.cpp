@@ -25,7 +25,6 @@ class AVLTree{
     void IN(Node* root);
     void POST(Node* root);
     int get_height(Node* node);
-    int balance_factor(Node* node);
     
 
 private:
@@ -41,13 +40,6 @@ int AVLTree::get_height(Node* node){
         return 0;
     }
     return node->height;
-}
-
-int AVLTree::balance_factor(Node* node){
-     if (node==nullptr){
-        return 0;
-    }
-    return get_height(node->left) - get_height(node->right);
 }
 
 //private implementations 
@@ -96,20 +88,21 @@ Node* AVLTree::Aint(Node* node, int k){
     if (node == nullptr){
         return new Node(k);
     }
-
     if (k< node->k){
         node->left = Aint(node->left,k);
     }
     else if (k > node->k){
         node->right = Aint(node->right,k);
     }
-    else return node;
+
 
 
     node -> height = max(get_height(node->left), get_height(node->right))+1;
-
-
-    int balancefactor = balance_factor(node);
+    int balancefactor;
+    if (node==nullptr){
+        balancefactor = 0;
+    }
+    else balancefactor =  get_height(node->left) - get_height(node->right);
 
     //rebalance tree
     //CASE 1: left left
@@ -170,27 +163,43 @@ Node* AVLTree::Dint(Node* root, int k){
     }
     
     root->height = max(get_height(root->left), get_height(root->right))+1;
-    int balancefactor = balance_factor(root);
+    int balancefactor ;
+    if (root==nullptr){
+        balancefactor = 0;
+    }
+    else balancefactor =  get_height(root->left) - get_height(root->right);
+
+    int leftvalue;
+    if (root->left==nullptr){
+        leftvalue = 0;
+    }
+    else leftvalue =  get_height(root->left) - get_height(root->right);
+   
+   int rightvalue; 
+   if (root->right == nullptr){
+        rightvalue = 0;
+   }
+   else rightvalue = get_height(root->left) - get_height(root->right);
     
     //rebalance tree
     //CASE 1: left left
-    if (balancefactor > 1 && balance_factor(root->left)>=0){
+    if (balancefactor > 1 && leftvalue>=0){
         return rightrotate(root);
     }
     //CASE 3: left-right case
-if (balancefactor > 1 && balance_factor(root->left) < 0) {
+if (balancefactor > 1 && leftvalue < 0) {
     root->left = leftrotate(root->left);
     return rightrotate(root);
 }
 
 //CASE 4: right-left case
-if (balancefactor < -1 && balance_factor(root->right) > 0) {
+if (balancefactor < -1 && rightvalue > 0) {
     root->right = rightrotate(root->right);
     return leftrotate(root);
 }
 
     //CASE 2: right right
-     if (balancefactor < -1 && balance_factor(root->right) <= 0){
+     if (balancefactor < -1 && rightvalue <= 0){
         return leftrotate(root);
         }
     return root;
