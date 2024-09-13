@@ -179,7 +179,7 @@ Node* AVLTree::Dint(Node* root, int k){
    if (root->right == nullptr){
         rightvalue = 0;
    }
-   else rightvalue = get_height(root->right) - get_height(root->left);
+   else rightvalue = get_height(root->left); 
     
     //rebalance tree
     //CASE 1: left left
