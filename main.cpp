@@ -169,17 +169,18 @@ Node* AVLTree::Dint(Node* root, int k){
     }
     else balancefactor =  get_height(root->left) - get_height(root->right);
 
-    int leftvalue;
-    if (root->left==nullptr){
-        leftvalue = 0;
-    }
-    else leftvalue =  get_height(root->left) - get_height(root->right);
-   
-   int rightvalue; 
-   if (root->right == nullptr){
-        rightvalue = 0;
-   }
-   else rightvalue = get_height(root->left) - get_height(root->right);
+   int leftvalue;
+        if (root->left == nullptr) {
+            leftvalue = 0;
+        } else {
+            leftvalue = get_height(root->left);
+        }
+  int rightvalue;
+        if (root->right == nullptr) {
+             rightvalue = 0;
+        } else {
+            rightvalue = get_height(root->right);
+        }
     
     //rebalance tree
     //CASE 1: left left
