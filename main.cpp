@@ -83,6 +83,33 @@ Node* AVLTree::getmaxNode(Node * node){
     return current;
 }
 
+// Pre-order traversal
+void AVLTree::PRE(Node* root) {
+    if (root != nullptr) {
+        cout << root->k << " ";
+        PRE(root->left);
+        PRE(root->right);
+    }
+}
+
+// In-order traversal
+void AVLTree::IN(Node* root) {
+    if (root != nullptr) {
+        IN(root->left);
+        cout << root->k << " ";
+        IN(root->right);
+    }
+}
+
+// Post-order traversal
+void AVLTree::POST(Node* root) {
+    if (root != nullptr) {
+        POST(root->left);
+        POST(root->right);
+        cout << root->k << " ";
+    }
+}
+
 //INSERT AINT()
 Node* AVLTree::Aint(Node* node, int k){
     if (node == nullptr){
@@ -168,7 +195,7 @@ Node* AVLTree::Dint(Node* root, int k){
     int balancefactor = get_height(root->left) - get_height(root->right);
 
     // CASE 1: Left Left Case
-    if (balancefactor > 1 && get_height(root->left->left) >= get_height(root->left->right)) {
+    if (balancefactor > 1 && root->left->left->height >= get_height(root->left->right)) {
         return rightrotate(root);
     }
 
@@ -192,33 +219,6 @@ Node* AVLTree::Dint(Node* root, int k){
     return root;
 }
 
-
-// Pre-order traversal
-void AVLTree::PRE(Node* root) {
-    if (root != nullptr) {
-        cout << root->k << " ";
-        PRE(root->left);
-        PRE(root->right);
-    }
-}
-
-// In-order traversal
-void AVLTree::IN(Node* root) {
-    if (root != nullptr) {
-        IN(root->left);
-        cout << root->k << " ";
-        IN(root->right);
-    }
-}
-
-// Post-order traversal
-void AVLTree::POST(Node* root) {
-    if (root != nullptr) {
-        POST(root->left);
-        POST(root->right);
-        cout << root->k << " ";
-    }
-}
 
 vector <string> parse_input(const string& input){
     vector<string> result;
