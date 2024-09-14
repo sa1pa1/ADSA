@@ -44,10 +44,12 @@ int AVLTree::get_height(Node* node){
 }
 
 void AVLTree::update_height(Node* node) {
-    if (node != nullptr) {
-        node->height = max(get_height(node->left), get_height(node->right)) + 1;
+    if (node !=nullptr){
+        node ->height = max(get_height(node->left),get_height(node->right))+1;
     }
+    node->height = max(get_height(node->left), get_height(node->right)) + 1;
 }
+
 //private implementations 
 //left rotate: 
 Node* AVLTree::leftrotate(Node* head){
@@ -127,8 +129,6 @@ Node* AVLTree::Aint(Node* node, int k){
     else if (k > node->k){
         node->right = Aint(node->right,k);
     }
-
-
 
    update_height(node);
     int balancefactor;
@@ -264,6 +264,7 @@ int main() {
         string cmd = cmds[i];
         if (cmd[0] == 'A') {
             int val = stoi(cmd.substr(1));
+            //error handling
             if (val < 1 || val > 100){
                 cout<<"Please insert values from 1 - 100"<<endl;
                 return -1;
