@@ -176,7 +176,12 @@ Node* AVLTree::Dint(Node* root, int k){
     }
     else { 
         if ((root->left == nullptr) || (root->right == nullptr)){
-            Node* temp = root->left ? root->left: root->right;
+            Node* temp;
+            if (root->left != nullptr) {
+                temp = root->left;
+            } else {
+                temp = root->right;
+            }
             //no children
             if (temp == nullptr){
                 temp = root;
