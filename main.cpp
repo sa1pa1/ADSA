@@ -25,6 +25,7 @@ class AVLTree{
     void IN(Node* root);
     void POST(Node* root);
     int get_height(Node* node);
+    void update_height(Node* node);
     
 
 private:
@@ -42,6 +43,11 @@ int AVLTree::get_height(Node* node){
     return node->height;
 }
 
+void AVLTree::update_height(Node* node) {
+    if (node != nullptr) {
+        node->height = max(get_height(node->left), get_height(node->right)) + 1;
+    }
+}
 //private implementations 
 //left rotate: 
 Node* AVLTree::leftrotate(Node* head){
@@ -51,8 +57,8 @@ Node* AVLTree::leftrotate(Node* head){
     newhead->left = head;
     head->right = temp;
 
-    head->height= max(get_height(head->left), get_height(head->right)) + 1;
-    newhead->height= max(get_height(newhead->left), get_height(newhead->right))+1;
+    update_height(head);
+    update_height(newhead);
 
     return newhead;
 }
@@ -65,11 +71,12 @@ Node* AVLTree::rightrotate(Node* head){
     head->left = T;
     newhead->right = head;
 
-    head->height= max(get_height(head->left), get_height(head->right))+1;
-    newhead->height= max(get_height(newhead->left), get_height(newhead->right)) + 1;
+   update_height(head);
+    update_height(newhead);
 
     return newhead;
 }
+
 
 Node* AVLTree::getmaxNode(Node * node){
     if (node == nullptr){
@@ -82,8 +89,32 @@ Node* AVLTree::getmaxNode(Node * node){
     }
     return current;
 }
+// Pre-order traversal
+void AVLTree::PRE(Node* root) {
+    if (root != nullptr) {
+        cout << root->k << " ";
+        PRE(root->left);
+        PRE(root->right);
+    }
+}
 
+// In-order traversal
+void AVLTree::IN(Node* root) {
+    if (root != nullptr) {
+        IN(root->left);
+        cout << root->k << " ";
+        IN(root->right);
+    }
+}
 
+// Post-order traversal
+void AVLTree::POST(Node* root) {
+    if (root != nullptr) {
+        POST(root->left);
+        POST(root->right);
+        cout << root->k << " ";
+    }
+}
 
 //INSERT AINT()
 Node* AVLTree::Aint(Node* node, int k){
@@ -99,7 +130,7 @@ Node* AVLTree::Aint(Node* node, int k){
 
 
 
-    node -> height = max(get_height(node->left), get_height(node->right))+1;
+   update_height(node);
     int balancefactor;
     if (node==nullptr){
         balancefactor = 0;
@@ -166,11 +197,11 @@ Node* AVLTree::Dint(Node* root, int k){
     }
     
  // Update the height of the current node
-    root->height = max(get_height(root->left), get_height(root->right)) + 1;
+    update_height(root);
     int balancefactor = get_height(root->left) - get_height(root->right);
 
     // CASE 1: Left Left Case
-    if (balancefactor > 1 && root->left->left->height >= get_height(root->left->right)) {
+    if (balancefactor > 1 && get_height(root->left->left) >= get_height(root->left->right)) {
         return rightrotate(root);
     }
 
@@ -193,32 +224,8 @@ Node* AVLTree::Dint(Node* root, int k){
 
     return root;
 }
-// Pre-order traversal
-void AVLTree::PRE(Node* root) {
-    if (root != nullptr) {
-        cout << root->k << " ";
-        PRE(root->left);
-        PRE(root->right);
-    }
-}
 
-// In-order traversal
-void AVLTree::IN(Node* root) {
-    if (root != nullptr) {
-        IN(root->left);
-        cout << root->k << " ";
-        IN(root->right);
-    }
-}
 
-// Post-order traversal
-void AVLTree::POST(Node* root) {
-    if (root != nullptr) {
-        POST(root->left);
-        POST(root->right);
-        cout << root->k << " ";
-    }
-}
 
 vector <string> parse_input(const string& input){
     vector<string> result;
