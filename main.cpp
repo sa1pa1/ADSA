@@ -4,87 +4,89 @@
 
 using namespace std;
 
-// Define the size of the hash table (26 letters from 'a' to 'z')
-const int TABLE_SIZE = 26;
-
-// Status for each slot in the hash table
-enum SlotStatus { NEVER_USED, TOMBSTONE, OCCUPIED };
+const int HASH_TABLE_SIZE = 26;
+enum Status { never_used, tombstone, occupied };
 
 class HashTable {
 private:
-    // Hash table to store the keys
+    //table for storing keys and table for value
     vector<string> table;
-    // Status for each slot
-    vector<SlotStatus> status;
+    vector<Status> status;
 
-    // Hash function to get the index based on the last character of the key
-    int hashFunction(const string &key) {
-        return key.back() - 'a';
+    //get index of last character in word
+    int hashFunction(const string &word) {
+        return word.back() - 'a';
     }
 
 public:
-    HashTable() {
-        // Initialize the table with empty strings and "never used" status
-        table.resize(TABLE_SIZE, "");
-        status.resize(TABLE_SIZE, NEVER_USED);
+    HashTable();
+    int search(const string &key);
+    void insert(const string &key); 
+    void remove(const string &key);
+    void printResult(); 
+};
+
+//initialise the hastable with never-use
+HashTable::HashTable(){
+     {
+        table.resize(HASH_TABLE_SIZE, "");
+        status.resize(HASH_TABLE_SIZE, never_used);
     }
+}
 
-    // Search for a key in the hash table
-    int search(const string &key) {
-        int idx = hashFunction(key);
-        int originalIdx = idx;
+//search for word
+int HashTable::search(const string &word){
+      int ID = hashFunction(word);
+      int intialID = ID;
 
-        while (status[idx] != NEVER_USED) { // If it's not "never used"
-            if (status[idx] == OCCUPIED && table[idx] == key) {
-                return idx; // Key found
+        while (status[ID] != never_used) { 
+            if (status[ID] == occupied && table[ID] == word) {
+                return ID;
             }
-            idx = (idx + 1) % TABLE_SIZE;
-            if (idx == originalIdx) {
-                break; // We've cycled through the entire table
-            }
-        }
-        return -1; // Key not found
-    }
-
-    // Insert a key into the hash table
-    void insert(const string &key) {
-        if (search(key) != -1) {
-            return; // Key already exists, do nothing
-        }
-
-        int idx = hashFunction(key);
-        int originalIdx = idx;
-
-        while (status[idx] == OCCUPIED) {
-            idx = (idx + 1) % TABLE_SIZE;
-            if (idx == originalIdx) {
-                return; // Table is full, shouldn't happen in this problem constraint
+            ID = (ID + 1) % HASH_TABLE_SIZE;
+            if (ID == intialID) {
+                break; //after cycling through whole table, break
             }
         }
+        return -1; //error
 
-     
-        table[idx] = key;
-        status[idx] = OCCUPIED;
-    }
+}
+//insert word into hastable
+void HashTable::insert(const string &word){
+    int ID = hashFunction(word);
 
-
-    void remove(const string &key) {
-        int idx = search(key);
-        if (idx != -1) {
-            status[idx] = TOMBSTONE; 
+    {   //if already exist 
+        if (search(word) != -1) {
+            return; //do nothing 
         }
+
+        while (status[ID] == occupied) {
+            ID = (ID + 1) % HASH_TABLE_SIZE;
+        }
+
+        table[ID] = word;
+        status[ID] = occupied;
     }
 
- 
-    void printTable() {
-        for (int i = 0; i < TABLE_SIZE; ++i) {
-            if (status[i] == OCCUPIED) {
+}
+
+//delete word 
+void HashTable::remove(const string &word){
+     int ID = search(word);
+        if (ID!= -1) {
+            status[ID] = tombstone; 
+        }
+}
+
+//print the result
+ void HashTable::printResult(){
+    for (int i = 0; i < HASH_TABLE_SIZE; ++i) {
+            if (status[i] == occupied) {
                 cout << table[i] << " ";
             }
         }
         cout << endl;
-    }
-};
+ }
 
 int main() {
     HashTable hashTable;
@@ -112,9 +114,6 @@ int main() {
             command += input[i];
         }
     }
-
-    // Output the result
-    hashTable.printTable();
-
+    hashTable.printResult();
     return 0;
 }
