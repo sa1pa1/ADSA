@@ -1,3 +1,4 @@
+//Pham Phuong Ngan BUi - a1867987
 #include <iostream>
 #include <vector>
 #include <string>
@@ -14,15 +15,15 @@ private:
     vector<Status> status;
 
     //get index of last character in word
-    int hashFunction(const string &word) {
+    int hashing(const string &word) {
         return word.back() - 'a';
     }
 
 public:
     HashTable();
-    int search(const string &key);
-    void insert(const string &key); 
-    void remove(const string &key);
+    int searchtable(const string &word);
+    void insert(const string &word); 
+    void remove(const string &word);
     void printResult(); 
 };
 
@@ -35,8 +36,8 @@ HashTable::HashTable(){
 }
 
 //search for word
-int HashTable::search(const string &word){
-      int ID = hashFunction(word);
+int HashTable::searchtable(const string &word){
+      int ID = hashing(word);
       int intialID = ID;
 
         while (status[ID] != never_used) { 
@@ -45,18 +46,18 @@ int HashTable::search(const string &word){
             }
             ID = (ID + 1) % HASH_TABLE_SIZE;
             if (ID == intialID) {
-                break; //after cycling through whole table, break
+                break; //exit after cycling through table
             }
         }
-        return -1; //error
+        return -1; //return if not found 
 
 }
 //insert word into hastable
 void HashTable::insert(const string &word){
-    int ID = hashFunction(word);
+    int ID = hashing(word);
 
     {   //if already exist 
-        if (search(word) != -1) {
+        if (searchtable(word) != -1) {
             return; //do nothing 
         }
 
@@ -72,7 +73,7 @@ void HashTable::insert(const string &word){
 
 //delete word 
 void HashTable::remove(const string &word){
-     int ID = search(word);
+     int ID = searchtable(word);
         if (ID!= -1) {
             status[ID] = tombstone; 
         }
@@ -94,13 +95,13 @@ int main() {
     string input;
     getline(cin, input);
 
-    string command;
+    string cmd;
     for (size_t i = 0; i <= input.length(); ++i) {
         if (i == input.length() || input[i] == ' ') {
-            if (!command.empty()) {
+            if (!cmd.empty()) {
             
-                char action = command[0];
-                string word = command.substr(1);
+                char action = cmd[0];
+                string word = cmd.substr(1);
 
                 if (action == 'A') {
                     hashTable.insert(word);
@@ -108,10 +109,10 @@ int main() {
                     hashTable.remove(word);
                 }
 
-                command.clear(); 
+                cmd.clear(); 
             }
         } else {
-            command += input[i];
+            cmd += input[i];
         }
     }
     hashTable.printResult();
