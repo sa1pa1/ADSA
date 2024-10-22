@@ -86,15 +86,19 @@ int minimumReconstructionCost(int n, const vector<vector<char>>& country, const 
     int totalCost = 0;
     int roadsUsed = 0;
 
-    for (const auto& [cost, u, v, action] : edges) {
-        if (uf.find(u) != uf.find(v)) {
-            uf.unionSets(u, v);
-            totalCost += cost;
-            roadsUsed++;
-        }
-        // Stop after we've connected exactly N-1 roads
-        if (roadsUsed == n-1) break;
+   for (const auto& edge : edges) {
+    int cost = get<0>(edge);
+    int u = get<1>(edge);
+    int v = get<2>(edge);
+    string action = get<3>(edge);
+
+    if (uf.find(u) != uf.find(v)) {
+        uf.unionSets(u, v);
+        totalCost += cost;
+        roadsUsed++;
     }
+    if (roadsUsed == n-1) break;
+}
 
     return totalCost;
 }
