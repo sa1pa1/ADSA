@@ -1,120 +1,133 @@
-//Pham Phuong Ngan BUi - a1867987
 #include <iostream>
 #include <vector>
-#include <string>
+#include <sstream>
+#include <algorithm>
 
 using namespace std;
 
-const int HASH_TABLE_SIZE = 26;
-enum Status { never_used, tombstone, occupied };
+// Function to split a string by a delimiter
+vector<string> split(const string &s, char delimiter) {
+    vector<string> tokens;
+    string token;
+    istringstream tokenStream(s);
+    while (getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
 
-class HashTable {
+// Union-Find (Disjoint Set Union) structure to manage connected components
+class UnionFind {
 private:
-    //table for storing keys and table for value
-    vector<string> table;
-    vector<Status> status;
-
-    //get index of last character in word
-    int hashing(const string &word) {
-        return word.back() - 'a';
+    vector<int> parent, rank;
+public:
+    UnionFind(int n) : parent(n), rank(n, 1) {
+        for (int i = 0; i < n; i++) parent[i] = i;
     }
 
-public:
-    HashTable();
-    int searchtable(const string &word);
-    void insert(const string &word); 
-    void remove(const string &word);
-    void printResult(); 
+    int find(int x) {
+        if (parent[x] != x) {
+            parent[x] = find(parent[x]); // Path compression
+        }
+        return parent[x];
+    }
+
+    void unionSets(int x, int y) {
+        int rootX = find(x);
+        int rootY = find(y);
+        if (rootX != rootY) {
+            if (rank[rootX] > rank[rootY]) {
+                parent[rootY] = rootX;
+            } else if (rank[rootX] < rank[rootY]) {
+                parent[rootX] = rootY;
+            } else {
+                parent[rootY] = rootX;
+                rank[rootX]++;
+            }
+        }
+    }
 };
 
-//initialise the hastable with never-use
-HashTable::HashTable(){
-     {
-        table.resize(HASH_TABLE_SIZE, "");
-        status.resize(HASH_TABLE_SIZE, never_used);
+// Helper function to convert letter to cost
+int letterToCost(char c) {
+    if ('A' <= c && c <= 'Z') {
+        return c - 'A';  // 'A' -> 0, 'B' -> 1, ..., 'Z' -> 25
+    } else if ('a' <= c && c <= 'z') {
+        return c - 'a' + 26;  // 'a' -> 26, 'b' -> 27, ..., 'z' -> 51
+    }
+    return 0;  // Default case
+}
+
+// Function to calculate minimum reconstruction cost
+int minimumReconstructionCost(int n, const vector<vector<char>>& country, const vector<vector<char>>& build, const vector<vector<char>>& destroy) {
+    vector<tuple<int, int, int, string>> edges;  // {cost, u, v, action}
+    
+    // Convert input matrices to edges
+ for (int i = 0; i < n; i++) {
+    for (int j = i + 1; j < n; j++) {
+        if (country[i][j] == '1') {
+            // Compare destruction cost with keeping the road for free (0 cost)
+            int destroyCost = letterToCost(destroy[i][j]);
+            edges.push_back({min(destroyCost, 0), i, j, "keep"}); // Consider keeping it
+        } else {
+            // Consider building the road
+            int buildCost = letterToCost(build[i][j]);
+            edges.push_back({buildCost, i, j, "build"});
+        }
     }
 }
 
-//search for word
-int HashTable::searchtable(const string &word){
-      int ID = hashing(word);
-      int intialID = ID;
 
-        while (status[ID] != never_used) { 
-            if (status[ID] == occupied && table[ID] == word) {
-                return ID;
-            }
-            ID = (ID + 1) % HASH_TABLE_SIZE;
-            if (ID == intialID) {
-                break; //exit after cycling through table
-            }
+    // Sort edges by cost
+    sort(edges.begin(), edges.end());
+
+    // Kruskal's algorithm to find the minimum spanning tree
+    UnionFind uf(n);
+    int totalCost = 0;
+    int roadsUsed = 0;
+
+    for (const auto& [cost, u, v, action] : edges) {
+        if (uf.find(u) != uf.find(v)) {
+            uf.unionSets(u, v);
+            totalCost += cost;
+            roadsUsed++;
         }
-        return -1; //return if not found 
-
-}
-//insert word into hastable
-void HashTable::insert(const string &word){
-    int ID = hashing(word);
-
-    {   //if already exist 
-        if (searchtable(word) != -1) {
-            return; //do nothing 
-        }
-
-        while (status[ID] == occupied) {
-            ID = (ID + 1) % HASH_TABLE_SIZE;
-        }
-
-        table[ID] = word;
-        status[ID] = occupied;
+        // Stop after we've connected exactly N-1 roads
+        if (roadsUsed == n-1) break;
     }
 
+    return totalCost;
 }
-
-//delete word 
-void HashTable::remove(const string &word){
-     int ID = searchtable(word);
-        if (ID!= -1) {
-            status[ID] = tombstone; 
-        }
-}
-
-//print the result
- void HashTable::printResult(){
-    for (int i = 0; i < HASH_TABLE_SIZE; ++i) {
-            if (status[i] == occupied) {
-                cout << table[i] << " ";
-            }
-        }
-        cout << endl;
- }
 
 int main() {
-    HashTable hashTable;
+    string countryStr, buildStr, destroyStr;
+    cin >> countryStr >> buildStr >> destroyStr;
 
-    string input;
-    getline(cin, input);
+    // Split the input strings by commas
+    vector<string> countryRows = split(countryStr, ',');
+    vector<string> buildRows = split(buildStr, ',');
+    vector<string> destroyRows = split(destroyStr, ',');
 
-    string cmd;
-    for (size_t i = 0; i <= input.length(); ++i) {
-        if (i == input.length() || input[i] == ' ') {
-            if (!cmd.empty()) {
-            
-                char action = cmd[0];
-                string word = cmd.substr(1);
+    int N = countryRows.size();  // Determine the number of cities (N x N matrix)
 
-                if (action == 'A') {
-                    hashTable.insert(word);
-                } else if (action == 'D') {
-                    hashTable.remove(word);
-                }
+    vector<vector<char>> country(N, vector<char>(N));
+    vector<vector<char>> build(N, vector<char>(N));
+    vector<vector<char>> destroy(N, vector<char>(N));
 
-                cmd.clear(); 
-            }
-        } else {
-            cmd += input[i];
+    // Fill matrices from the input strings
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            country[i][j] = countryRows[i][j];
+            build[i][j] = buildRows[i][j];
+            destroy[i][j] = destroyRows[i][j];
         }
     }
-    hashTable.printResult();
+
+    // Calculate the minimum reconstruction cost
+    int result = minimumReconstructionCost(N, country, build, destroy);
+
+    // Output the result
+    cout << result << endl;
+
     return 0;
 }
