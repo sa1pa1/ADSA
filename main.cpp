@@ -8,7 +8,7 @@ using namespace std;
 
 int charToCost(char c) {
     if (c >= 'A' && c <= 'Z') return c - 'A';
-    if (c >= 'a' && c <= 'z') return c - 'a' ;
+    if (c >= 'a' && c <= 'z') return c - 'a' +26 ;
     return -1; // Invalid character 
 }
 
