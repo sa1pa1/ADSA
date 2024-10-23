@@ -54,40 +54,42 @@ struct Edge {
 // Minimum cost to reconstruct
 int reconstructRoads(int N, const vector<string>& country, const vector<string>& build, const vector<string>& destroy) {
     vector<Edge> edges;
-    int existingRoadsCount = 0;
-
+  UnionFind uf(N);
+    
+    // Handle existing roads
     for (int i = 0; i < N; ++i) {
         for (int j = i + 1; j < N; ++j) {
             if (country[i][j] == '1') {
-                // Existing road, destroy
-                edges.push_back(Edge(i, j, charToCost(destroy[i][j]), 1)); // destroy type
-                existingRoadsCount++;
-            } else {
-                // No road exists, build
-                edges.push_back(Edge(i, j, charToCost(build[i][j]), 2)); // build type
+                // Existing road, consider destroying
+                int destroyCost = charToCost(destroy[i][j]);
+                edges.push_back(Edge(i, j, destroyCost, 1)); // destroy type
+                uf.unite(i, j); // Mark these as already connected in the union-find
             }
         }
     }
 
-    if (existingRoadsCount == N) {
-        sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
-            if (a.type == 1 && b.type == 1) return a.cost < b.cost;
-            return a.type > b.type;  // prioritize destroy type
-        });
-        return edges[0].cost;  // Return the minimum destroy cost
+    // Add roads that can be built
+    for (int i = 0; i < N; ++i) {
+        for (int j = i + 1; j < N; ++j) {
+            if (country[i][j] == '0') {
+                // No road exists, consider building
+                int buildCost = charToCost(build[i][j]);
+                edges.push_back(Edge(i, j, buildCost, 2)); // build type
+            }
+        }
     }
 
-
+    // Sort edges: first by cost, then prioritize build over destroy
     sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
         if (a.cost == b.cost) {
-            return a.type < b.type;  
+            return a.type < b.type; // Prefer build (2) over destroy (1) if costs are equal
         }
         return a.cost < b.cost;
     });
-    
-    UnionFind uf(N);
+
     int totalCost = 0;
 
+    // Process edges and form the MST
     for (const auto& edge : edges) {
         if (uf.unite(edge.u, edge.v)) {
             totalCost += edge.cost;
