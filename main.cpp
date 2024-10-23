@@ -1,136 +1,129 @@
 #include <iostream>
 #include <vector>
-#include <sstream>
 #include <algorithm>
+#include <string>
 
 using namespace std;
 
-// Function to split a string by a delimiter
-vector<string> split(const string &s, char delimiter) {
-    vector<string> tokens;
-    string token;
-    istringstream tokenStream(s);
-    while (getline(tokenStream, token, delimiter)) {
-        tokens.push_back(token);
-    }
-    return tokens;
+
+int charToCost(char c) {
+    if (c >= 'A' && c <= 'Z') return c - 'A';
+    if (c >= 'a' && c <= 'z') return c - 'a' ;
+    return -1; // Invalid character 
 }
 
-// Union-Find (Disjoint Set Union) structure to manage connected components
-class UnionFind {
-private:
+// Disjoint Set
+struct UnionFind {
     vector<int> parent, rank;
-public:
-    UnionFind(int n) : parent(n), rank(n, 1) {
-        for (int i = 0; i < n; i++) parent[i] = i;
+
+    UnionFind(int n) {
+        parent.resize(n);
+        rank.resize(n, 0);
+        for (int i = 0; i < n; ++i) parent[i] = i;
     }
 
-    int find(int x) {
-        if (parent[x] != x) {
-            parent[x] = find(parent[x]); // Path compression
-        }
-        return parent[x];
+    int find(int u) {
+        if (parent[u] != u) parent[u] = find(parent[u]);
+        return parent[u];
     }
 
-    void unionSets(int x, int y) {
-        int rootX = find(x);
-        int rootY = find(y);
-        if (rootX != rootY) {
-            if (rank[rootX] > rank[rootY]) {
-                parent[rootY] = rootX;
-            } else if (rank[rootX] < rank[rootY]) {
-                parent[rootX] = rootY;
+    bool unite(int u, int v) {
+        int rootU = find(u);
+        int rootV = find(v);
+        if (rootU != rootV) {
+            if (rank[rootU] > rank[rootV]) {
+                parent[rootV] = rootU;
+            } else if (rank[rootU] < rank[rootV]) {
+                parent[rootU] = rootV;
             } else {
-                parent[rootY] = rootX;
-                rank[rootX]++;
+                parent[rootV] = rootU;
+                rank[rootU]++;
             }
+            return true;
         }
+        return false;
     }
 };
 
-// Helper function to convert letter to cost
-int letterToCost(char c) {
-    if ('A' <= c && c <= 'Z') {
-        return c - 'A';  // 'A' -> 0, 'B' -> 1, ..., 'Z' -> 25
-    } else if ('a' <= c && c <= 'z') {
-        return c - 'a' + 26;  // 'a' -> 26, 'b' -> 27, ..., 'z' -> 51
-    }
-    return 0;  // Default case
-}
+// Edge structure (storing informationa bout each road)
+struct Edge {
+    int u, v, cost, type; 
+    Edge(int u, int v, int cost, int type) : u(u), v(v), cost(cost), type(type) {}
+};
 
-// Function to calculate minimum reconstruction cost
-int minimumReconstructionCost(int n, const vector<vector<char>>& country, const vector<vector<char>>& build, const vector<vector<char>>& destroy) {
-    vector<tuple<int, int, int, string>> edges;  // {cost, u, v, action}
-    
-    // Convert input matrices to edges
- for (int i = 0; i < n; i++) {
-    for (int j = i + 1; j < n; j++) {
-        if (country[i][j] == '1') {
-            // Compare destruction cost with keeping the road for free (0 cost)
-            int destroyCost = letterToCost(destroy[i][j]);
-            edges.push_back({min(destroyCost, 0), i, j, "keep"}); // Consider keeping it
-        } else {
-            // Consider building the road
-            int buildCost = letterToCost(build[i][j]);
-            edges.push_back({buildCost, i, j, "build"});
+// Minimum cost to reconstruct
+int reconstructRoads(int N, const vector<string>& country, const vector<string>& build, const vector<string>& destroy) {
+    vector<Edge> edges;
+    int existingRoadsCount = 0;
+
+    for (int i = 0; i < N; ++i) {
+        for (int j = i + 1; j < N; ++j) {
+            if (country[i][j] == '1') {
+                // Existing road, destroy
+                edges.push_back(Edge(i, j, charToCost(destroy[i][j]), 1)); // destroy type
+                existingRoadsCount++;
+            } else {
+                // No road exists, build
+                edges.push_back(Edge(i, j, charToCost(build[i][j]), 2)); // build type
+            }
         }
     }
-}
 
-
-    // Sort edges by cost
-    sort(edges.begin(), edges.end());
-
-    // Kruskal's algorithm to find the minimum spanning tree
-    UnionFind uf(n);
-    int totalCost = 0;
-    int roadsUsed = 0;
-
-   for (const auto& edge : edges) {
-    int cost = get<0>(edge);
-    int u = get<1>(edge);
-    int v = get<2>(edge);
-    string action = get<3>(edge);
-
-    if (uf.find(u) != uf.find(v)) {
-        uf.unionSets(u, v);
-        totalCost += cost;
-        roadsUsed++;
+    if (existingRoadsCount == N) {
+        sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
+            if (a.type == 1 && b.type == 1) return a.cost < b.cost;
+            return a.type > b.type;  // prioritize destroy type
+        });
+        return edges[0].cost;  // Return the minimum destroy cost
     }
-    if (roadsUsed == n-1) break;
-}
+
+
+    sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
+        if (a.cost == b.cost) {
+            return a.type < b.type;  
+        }
+        return a.cost < b.cost;
+    });
+    
+    UnionFind uf(N);
+    int totalCost = 0;
+
+    for (const auto& edge : edges) {
+        if (uf.unite(edge.u, edge.v)) {
+            totalCost += edge.cost;
+        }
+    }
 
     return totalCost;
 }
 
-int main() {
-    string countryStr, buildStr, destroyStr;
-    cin >> countryStr >> buildStr >> destroyStr;
-
-    // Split the input strings by commas
-    vector<string> countryRows = split(countryStr, ',');
-    vector<string> buildRows = split(buildStr, ',');
-    vector<string> destroyRows = split(destroyStr, ',');
-
-    int N = countryRows.size();  // Determine the number of cities (N x N matrix)
-
-    vector<vector<char>> country(N, vector<char>(N));
-    vector<vector<char>> build(N, vector<char>(N));
-    vector<vector<char>> destroy(N, vector<char>(N));
-
-    // Fill matrices from the input strings
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            country[i][j] = countryRows[i][j];
-            build[i][j] = buildRows[i][j];
-            destroy[i][j] = destroyRows[i][j];
+vector<string> split(const string &str, char delimiter) {
+    vector<string> result;
+    string temp;
+    for (char ch : str) {
+        if (ch == delimiter) {
+            result.push_back(temp);
+            temp.clear();
+        } else {
+            temp += ch;
         }
     }
+    result.push_back(temp);  // add the last part
+    return result;
+}
 
-    // Calculate the minimum reconstruction cost
-    int result = minimumReconstructionCost(N, country, build, destroy);
+int main() {
+    string countryInput, buildInput, destroyInput;
 
-    // Output the result
+    cin >> countryInput >> buildInput >> destroyInput;
+
+    vector<string> country = split(countryInput, ',');
+    vector<string> build = split(buildInput, ',');
+    vector<string> destroy = split(destroyInput, ',');
+
+    int N = country.size();
+
+    int result = reconstructRoads(N, country, build, destroy);
     cout << result << endl;
 
     return 0;
