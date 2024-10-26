@@ -1,34 +1,40 @@
-#include <iostream>
-#include <vector>
+#include <iostream> 
+#include <vector> 
 #include <algorithm>
-#include <string>
+#include <string> 
+#include <unordered_set>
 
 using namespace std;
 
-
-int charToCost(char c) {
-    if (c >= 'A' && c <= 'Z') return c - 'A';
-    if (c >= 'a' && c <= 'z') return c - 'a' +26 ;
-    return -1; // Invalid character 
+//translating character to cost 
+int ChartoNum (char c){
+     if (c >= 'A' && c <= 'Z') return c - 'A';
+    if (c >= 'a' && c <= 'z') return c - 'a' + 26;
+    return -1; 
 }
 
-// Disjoint Set
+//Disjoint Set (Union Find structure)
 struct UnionFind {
-    vector<int> parent, rank;
+    vector<int> parent;
+    vector<int> rank;
 
-    UnionFind(int n) {
+    UnionFind(int n){
         parent.resize(n);
-        rank.resize(n, 0);
-        for (int i = 0; i < n; ++i) parent[i] = i;
+        rank.resize(n,0);
+        for (int i =0; i < n; i++){
+            parent[i] = i;
+        }
     }
 
-    int find(int u) {
-        if (parent[u] != u) parent[u] = find(parent[u]);
-        return parent[u];
+    int find (int u){
+        if (parent[u] != u){ //if u is not its own parent
+            parent[u] = find(parent[u]);
+            } //recursively find root path. 
+            return parent[u];
     }
 
-    bool unite(int u, int v) {
-        int rootU = find(u);
+    bool unite(int u, int v){
+         int rootU = find(u);
         int rootV = find(v);
         if (rootU != rootV) {
             if (rank[rootU] > rank[rootV]) {
@@ -45,65 +51,63 @@ struct UnionFind {
     }
 };
 
-// Edge structure 
+//edge structure to represent roads 
 struct Edge {
-    int u, v, cost, type; 
+    int u, v, cost, type;
     Edge(int u, int v, int cost, int type) : u(u), v(v), cost(cost), type(type) {}
 };
 
-// Minimum cost to reconstruct
-int reconstructRoads(int N, const vector<string>& country, const vector<string>& build, const vector<string>& destroy) {
-    vector<Edge> edges;
-    int existingRoadsCount = 0;
-    UnionFind uf(N); 
-    
-  
-    for (int i = 0; i < N; ++i) {
-        for (int j = i + 1; j < N; ++j) {
+//comparison for sorting edges in ascending order 
+bool compareEdgeCostAscending(const Edge& a, const Edge& b) {
+    return a.cost < b.cost;
+};
+//comparison for sorting edges in descending order 
+bool compareEdgeCostDescending(const Edge& a, const Edge& b) {
+    return a.cost > b.cost;
+};
+
+//Calculate minimum cost to reconstruct road system
+
+int ReconstructRoad(int N, const vector<string> &country, const vector<string> &build, const vector<string>& destroy){
+    vector<Edge> buildEdges, destroyEdges;
+    UnionFind uf_initial(N);
+
+    for (int i=0;i<N;i++){
+        for (int j = i +1; j <N; j++){
             if (country[i][j] == '1') {
-           
-                edges.push_back(Edge(i, j, charToCost(destroy[i][j]), 1)); 
-                existingRoadsCount++;
-                uf.unite(i, j); 
+                destroyEdges.push_back(Edge(i, j, ChartoNum(destroy[i][j]), 1));
+                uf_initial.unite(i, j);  // Union endpoints of existing roads
             } else {
-              
-                edges.push_back(Edge(i, j, charToCost(build[i][j]), 2)); 
+                buildEdges.push_back(Edge(i, j, ChartoNum(build[i][j]), 2));
             }
         }
     }
+    
 
-    // Step 2: Check if all roads already exist
-    if (existingRoadsCount == N-1) {
-        // If all roads exist, return the minimum destroy cost
-        sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
-            if (a.type == 1 && b.type == 1) return a.cost < b.cost;
-            return a.type > b.type;  
-        });
-        return edges[0].cost; 
-    } else if (existingRoadsCount == N - 1 && uf.find(0) == uf.find(N - 1)) {
-    // If the existing roads form a connected spanning tree, no additional cost needed
-    return 0;
-}
+// Use them in the sort calls
+sort(buildEdges.begin(), buildEdges.end(), compareEdgeCostAscending);
+sort(destroyEdges.begin(), destroyEdges.end(), compareEdgeCostDescending);
 
-  
-    sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
-        if (a.cost == b.cost) {
-            return a.type < b.type;  
+
+ int totalCost = 0;
+UnionFind uf_final(N);
+
+for (const auto& edge : destroyEdges) {
+        if (!uf_final.unite(edge.u, edge.v)) {
+            totalCost += edge.cost;  
         }
-        return a.cost < b.cost;
-    });
+    }
 
-  
-    int totalCost = 0;
-    for (const auto& edge : edges) {
-        if (uf.unite(edge.u, edge.v)) {
-            totalCost += edge.cost; 
+     for (const auto& edge : buildEdges) {
+        if (uf_final.unite(edge.u, edge.v)) {
+            totalCost += edge.cost;  
         }
     }
 
     return totalCost;
 }
 
+//Parsing input into main, splitting of comma and space
 vector<string> split(const string &str, char delimiter) {
     vector<string> result;
     string temp;
@@ -119,18 +123,19 @@ vector<string> split(const string &str, char delimiter) {
     return result;
 }
 
+
 int main() {
-    string countryInput, buildInput, destroyInput;
+    string input1, input2, input3;
 
-    cin >> countryInput >> buildInput >> destroyInput;
+    cin >> input1 >> input2 >> input3;
 
-    vector<string> country = split(countryInput, ',');
-    vector<string> build = split(buildInput, ',');
-    vector<string> destroy = split(destroyInput, ',');
+    vector<string> country = split(input1, ',');
+    vector<string> build = split(input2, ',');
+    vector<string> destroy = split(input3, ',');
 
     int N = country.size();
 
-    int result = reconstructRoads(N, country, build, destroy);
+    int result = ReconstructRoad(N, country, build, destroy);
     cout << result << endl;
 
     return 0;
