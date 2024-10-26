@@ -45,7 +45,7 @@ struct UnionFind {
     }
 };
 
-// Edge structure (storing informationa bout each road)
+// Edge structure 
 struct Edge {
     int u, v, cost, type; 
     Edge(int u, int v, int cost, int type) : u(u), v(v), cost(cost), type(type) {}
@@ -55,46 +55,49 @@ struct Edge {
 int reconstructRoads(int N, const vector<string>& country, const vector<string>& build, const vector<string>& destroy) {
     vector<Edge> edges;
     int existingRoadsCount = 0;
-    UnionFind uf(N); // Initialize Union-Find for N nodes
+    UnionFind uf(N); 
     
-    // Step 1: Add existing roads (marked '1') with destruction costs
+  
     for (int i = 0; i < N; ++i) {
         for (int j = i + 1; j < N; ++j) {
             if (country[i][j] == '1') {
-                // Existing road, consider destruction
-                edges.push_back(Edge(i, j, charToCost(destroy[i][j]), 1)); // destroy type
+           
+                edges.push_back(Edge(i, j, charToCost(destroy[i][j]), 1)); 
                 existingRoadsCount++;
-                uf.unite(i, j); // Mark these as already connected
+                uf.unite(i, j); 
             } else {
-                // No road exists, consider building
-                edges.push_back(Edge(i, j, charToCost(build[i][j]), 2)); // build type
+              
+                edges.push_back(Edge(i, j, charToCost(build[i][j]), 2)); 
             }
         }
     }
 
     // Step 2: Check if all roads already exist
-    if (existingRoadsCount == N) {
-        // If all roads exist, return the minimum destroy cost (if required)
+    if (existingRoadsCount == N-1) {
+        // If all roads exist, return the minimum destroy cost
         sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
             if (a.type == 1 && b.type == 1) return a.cost < b.cost;
-            return a.type > b.type;  // prioritize destroy type if both are destroy
+            return a.type > b.type;  
         });
-        return edges[0].cost; // Return the minimum destroy cost
-    }
+        return edges[0].cost; 
+    } else if (existingRoadsCount == N - 1 && uf.find(0) == uf.find(N - 1)) {
+    // If the existing roads form a connected spanning tree, no additional cost needed
+    return 0;
+}
 
-    // Step 3: Sort edges by cost (and type, prioritize building over destruction if costs are equal)
+  
     sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
         if (a.cost == b.cost) {
-            return a.type < b.type;  // prioritize build type (2) over destroy type (1)
+            return a.type < b.type;  
         }
         return a.cost < b.cost;
     });
 
-    // Step 4: Process edges to calculate the minimum total cost using Union-Find
+  
     int totalCost = 0;
     for (const auto& edge : edges) {
         if (uf.unite(edge.u, edge.v)) {
-            totalCost += edge.cost; // Only add the cost if it forms a new connection
+            totalCost += edge.cost; 
         }
     }
 
@@ -112,7 +115,7 @@ vector<string> split(const string &str, char delimiter) {
             temp += ch;
         }
     }
-    result.push_back(temp);  // add the last part
+    result.push_back(temp); 
     return result;
 }
 
